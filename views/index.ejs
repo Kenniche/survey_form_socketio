@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script
+    src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" 
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Survey Form Page</title>
+    <script type ="text/javascript">
+        $(document).ready(function (){
+            // this triggers the connection event in our server!
+            var socket  = io.connect();
+            // we'll write all the socket stuff after the above line!
+            $('#surveyForm').submit(function (event){
+                event.preventDefault();
+                socket.emit("posting_form", {
+                    name:  $('#FullName').val(), 
+                    location: $('#Location').val(), 
+                    language: $('#Language').val(), 
+                    comment: $('#comment').val()
+                });
+            });
+            socket.on('updated_message', function (data){
+                addMessage(JSON.stringify(data.response), data.number);
+                $('#FullName').val("");
+                $('#Location').val("sanjose");
+                $('#Language').val("python")
+                $('#comment').val("");
+            });
+            // socket.on('random_number', function (data){
+            //     console.log('Random Number: '  + data.response);
+            //     addMessage(data.response);
+            // });
+            function addMessage(data, number) {
+                messages = document.getElementById('putHere');
+                messages.innerHTML = `You've emitted the following information to the server: ${data} <br> Your lucky number emitted by the server is: ${number}`;
+                }
+        })
+    </script>
+</head>
+<body>
+    <div class="container  d-flex justify-content-center">
+        <div class="card shadow p-3 mb-5 bg-light rounded">
+            <div class="card-header">
+                <h1>Dojo Survey Form</h1>
+            </div>
+
+
+    <div id="putHere"></div>
+
+        <form action="/submitForm" method="post" id="surveyForm">
+            <div class="form-group">
+                <label for="FullName">Your Name: </label>
+                <input type="text" class="form-control" name="FullName" id="FullName">
+            </div>
+            <div class="form-group">
+                <label for="Location">Dojo Location: </label>
+                <select class="form-control" name="Location" id="Location">
+                <option value="San Jose">San Jose</option>
+                <option value="Seattle">Seattle</option>
+                <option value="Los Angeles">Los Angeles</option>
+                <option value="Dallas">Dallas</option>
+                <option value="Arlington">Arlington</option>
+                <option value="Chicago">Chicago</option>
+                <option value="Tulsa">Tulsa</option>
+                <option value="Oakland">Oakland</option>
+                <option value="Boise">Boise</option>
+                <option value="Orange County">Orange County</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="Language">Favorite Language: </label>
+                <select name="Language" class="form-control" id="Language">
+                <option value="HTML">HTML</option>
+                <option value="CSS">CSS</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="MySQL">MySQL</option>
+                <option value="Python">Python</option>
+                <option value="Mean">Mean</option>
+                <option value="C#">C#</option>
+                <option value=".Net">ASP.NET</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="Comment">Comment (Optional):</label>
+                <br>
+                <textarea name="Comment" cols="5" rows="5" class="form-control" id="comment"></textarea>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
